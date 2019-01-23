@@ -9,28 +9,42 @@ const videoExt = ['mp4', 'avi', 'wmv', 'mkv'];
 
 exports.list_all = function(req, res) {
     let location = req.query.location ? req.query.location : os.homedir();
-    let files = [];
+    let data = {
+        location: location,
+        files: []
+    };
 
     fs.readdirSync(location).forEach(file => {
         const fullPath = location + '\\' + file;
         const fileData = fs.lstatSync(location + '/' + file);
-        const ext = getExtension(fullPath);
 
-        files = [...files, {
+        data.files = [...data.files, {
             name: file,
             data: {
                 isDirectory: fileData.isDirectory(),
                 sizeBytes: fileData.size,
                 fullPath: fullPath,
-                type: audioExt.indexOf(ext) > -1 ? 'AUDIO' : (videoExt.indexOf(ext) > -1 ? 'VIDEO' : 'OTHER')
+                type: fileData.isDirectory() ? 'DIRECTORY' : getType(fullPath)
             }
         }];
     });
 
-    res.json(files);
+    res.json(data);
 };
 
 function getExtension(filename) {
     let ext = path.extname(filename||'').split('.');
     return ext[ext.length - 1];
+}
+
+function getType(fullPath) {
+    const ext = getExtension(fullPath);
+    if (audioExt.indexOf(ext) > -1) {
+        return 'AUDIO';
+    } else if (videoExt.indexOf(ext) > -1) {
+        return 'VIDEO';
+    } else {
+        return 'OTHER';
+    }
+
 }
