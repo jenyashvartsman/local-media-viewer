@@ -21,6 +21,9 @@ app.controller('myCtrl', function($scope, $http) {
         showOther: false
     };
 
+    $scope.selectedFile = null;
+    $scope.selectedFileStreamUrl = null;
+
     $scope.goTo = function(location) {
         $http.get('api/media-file?location=' + location)
             .then(function(response) {
@@ -56,5 +59,23 @@ app.controller('myCtrl', function($scope, $http) {
         }
     };
 
-    $scope.goTo('');
+    $scope.playFile = function(file) {
+        $scope.selectedFile = file;
+        $scope.selectedFileStreamUrl = location.href + 'api/stream-file?location=' + file.data.fullPath;
+
+        console.log($scope.selectedFileStreamUrl);
+
+        setTimeout(function () {
+            $('#exampleModalCenter').on('hidden.bs.modal', function (e) {
+                $http.get('api/stop-stream-file')
+                    .then(function(response) {
+                        $scope.selectedFile = null;
+                        $scope.selectedFileStreamUrl = null;
+                        console.log('hide');
+                    });
+            })
+        }, 1);
+    };
+
+    $scope.goTo('C:\\Users\\jenyas\\Downloads');
 });
