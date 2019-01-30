@@ -5,22 +5,20 @@ const fs = require('fs'),
     path = require('path');
 
 const audioExt = ['wav', 'mp3', 'wma'];
-const videoExt = ['mp4', 'avi', 'wmv', 'mkv', 'mov'];
+const videoExt = ['mp4', 'avi', 'wmv', 'mov'];
 
-let streamedContent;
-
-exports.list_all = function (req, res) {
-    let location = req.query.location ? req.query.location : os.homedir();
+exports.file = function (req, res) {
+    let path = req.query.path ? req.query.path : os.homedir();
     let data = {
-        location: location,
+        path: path,
         files: []
     };
 
-
-    fs.readdirSync(location).forEach(file => {
+    // get all files and directories based on path
+    fs.readdirSync(path).forEach(file => {
         try {
-            const fullPath = location + '\\' + file;
-            const fileData = fs.lstatSync(location + '/' + file);
+            const fullPath = path + '\\' + file;
+            const fileData = fs.lstatSync(fullPath);
 
             data.files = [...data.files, {
                 name: file,
@@ -38,8 +36,8 @@ exports.list_all = function (req, res) {
     res.json(data);
 };
 
-exports.stream_file = function (req, res) {
-    const path = req.query.location;
+exports.streamStart = function (req, res) {
+    const path = req.query.path;
     const stat = fs.statSync(path);
     const fileSize = stat.size;
     const range = req.headers.range;
@@ -66,15 +64,11 @@ exports.stream_file = function (req, res) {
             /*'Content-Type': 'video/mp4',*/
         };
         res.writeHead(200, head);
-        streamedContent = fs.createReadStream(path).pipe(res);
+        fs.createReadStream(path).pipe(res);
     }
 };
 
-exports.stop_stream_file = function (req, res) {
-    if (streamedContent) {
-        streamedContent.close();
-    }
-
+exports.streamStop = function (req, res) {
     res.json();
 };
 

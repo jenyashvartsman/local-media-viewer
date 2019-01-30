@@ -7,7 +7,7 @@ let express = require('express'),
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-let routes = require('./api/routes/mediaFileRoutes'); //importing route
+let routes = require('./api/appRoutes'); //importing route
 routes(app);
 
 app.use(serveStatic("public_html"));

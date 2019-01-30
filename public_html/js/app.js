@@ -13,7 +13,7 @@ app.filter('filterFiles', function () {
 
 app.controller('myCtrl', function($scope, $http) {
     $scope.files = [];
-    $scope.location = '';
+    $scope.path = '';
 
     $scope.filter = {
         showAudio: true,
@@ -24,15 +24,32 @@ app.controller('myCtrl', function($scope, $http) {
     $scope.selectedFile = null;
     $scope.selectedFileStreamUrl = null;
 
-    $scope.goTo = function(location) {
-        $http.get('api/media-file?location=' + location)
+    $scope.navigate = function(path) {
+        $http.get('api/file?path=' + path)
             .then(function(response) {
                 $scope.files = $scope.mapFilesResponse(response.data.files);
-                $scope.location = response.data.location;
+                $scope.path = response.data.path;
             });
     };
 
+    $scope.navigateBack = function () {
+        let pathArr = $scope.path.split('\\');
+        if (pathArr.length > 1) {
+            pathArr.pop();
+        }
+        $scope.path = pathArr.join('\\');
+        $scope.navigate($scope.path);
+
+    };
+
     $scope.mapFilesResponse = function (filesToMap) {
+        filesToMap.map(item => {
+            if (!item.data.isDirectory) {
+                item.data.size = $scope.bytesToSize(item.data.sizeBytes);
+            }
+           return item;
+        });
+
         let directories = filesToMap.filter(item => {
             return item.data.isDirectory;
         });
@@ -43,39 +60,27 @@ app.controller('myCtrl', function($scope, $http) {
         return directories.concat(files);
     };
 
-    $scope.navigateBack = function () {
-        let locationArr = $scope.location.split('\\');
-        if (locationArr.length > 1) {
-            locationArr.pop();
-        }
-        $scope.location = locationArr.join('\\');
-        $scope.goTo($scope.location);
-
-    };
-
-    $scope.navigateOrPlay = function (file) {
-        if (file.data.isDirectory) {
-            $scope.goTo(file.data.fullPath);
-        }
-    };
-
     $scope.playFile = function(file) {
         $scope.selectedFile = file;
-        $scope.selectedFileStreamUrl = location.href + 'api/stream-file?location=' + file.data.fullPath;
-
-        console.log($scope.selectedFileStreamUrl);
+        $scope.selectedFileStreamUrl = location.href + 'api/stream/start?path=' + file.data.fullPath;
 
         setTimeout(function () {
             $('#exampleModalCenter').on('hidden.bs.modal', function (e) {
-                $http.get('api/stop-stream-file')
+                $http.get('api/stream/stop')
                     .then(function(response) {
                         $scope.selectedFile = null;
                         $scope.selectedFileStreamUrl = null;
-                        console.log('hide');
                     });
             })
         }, 1);
     };
 
-    $scope.goTo('C:\\Users\\jenyas\\Downloads');
+    $scope.bytesToSize = function (bytes) {
+        let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Byte';
+        let i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    };
+
+    $scope.navigate('C:\\Users\\jenyas\\Downloads');
 });

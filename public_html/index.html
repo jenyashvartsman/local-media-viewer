@@ -39,9 +39,9 @@
         <div class="col-md-11">
             <form>
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Search" ng-model="location">
+                    <input type="text" class="form-control" placeholder="Search" ng-model="path">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-primary" type="submit" ng-click="goTo(location)">Go to</button>
+                        <button class="btn btn-outline-primary" type="submit" ng-click="navigate(path)">Go to</button>
                     </div>
                 </div>
             </form>
@@ -92,16 +92,17 @@
                     </thead>
                     <tbody>
                     <tr ng-repeat="file in files | filterFiles: filter | filter : search">
-                        <td ng-click="navigateOrPlay(file)" class="icons" ng-switch on="file.data.type">
-                            <img class="icon" src="img/directory-icon.png" ng-switch-when="DIRECTORY">
-                            <img class="icon" src="img/music-note-icon.png" ng-switch-when="AUDIO">
-                            <img class="icon" src="img/video-icon.png" ng-switch-when="VIDEO" ng-click="playFile(file)"
+                        <td class="icons" ng-switch on="file.data.type">
+                            <img ng-click="navigate(file.data.fullPath)" class="icon" src="img/directory-icon.png" ng-switch-when="DIRECTORY">
+                            <img ng-click="playFile(file)" class="icon" src="img/music-note-icon.png" ng-switch-when="AUDIO"
+                                 data-toggle="modal" data-target="#exampleModalCenter">
+                            <img ng-click="playFile(file)" class="icon" src="img/video-icon.png" ng-switch-when="VIDEO"
                                  data-toggle="modal" data-target="#exampleModalCenter">
                             <img class="icon" src="img/binary-icon.png" ng-switch-when="OTHER">
                         </td>
                         <td>{{file.data.type}}</td>
                         <td>{{file.name}}</td>
-                        <td>{{file.data.sizeBytes}}</td>
+                        <td>{{file.data.size}}</td>
                     </tr>
                     <tr ng-if="files.length === 0">
                         <td colspan="4" class="text-center">
@@ -117,10 +118,10 @@
     <!-- Modal -->
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"
         ng-if="selectedFile">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">{{selectedFile.data.name}}</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">{{selectedFile.name}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
