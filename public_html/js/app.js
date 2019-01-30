@@ -82,5 +82,5 @@ app.controller('myCtrl', function($scope, $http) {
         return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
     };
 
-    $scope.navigate('C:\\Users\\jenyas\\Downloads');
+    $scope.navigate('');
 });
