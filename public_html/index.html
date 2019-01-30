@@ -88,21 +88,36 @@
                         <th>Type</th>
                         <th>Name</th>
                         <th>Size</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr ng-repeat="file in files | filterFiles: filter | filter : search">
                         <td class="icons" ng-switch on="file.data.type">
-                            <img ng-click="navigate(file.data.fullPath)" class="icon" src="img/directory-icon.png" ng-switch-when="DIRECTORY">
-                            <img ng-click="playFile(file)" class="icon" src="img/music-note-icon.png" ng-switch-when="AUDIO"
-                                 data-toggle="modal" data-target="#exampleModalCenter">
-                            <img ng-click="playFile(file)" class="icon" src="img/video-icon.png" ng-switch-when="VIDEO"
-                                 data-toggle="modal" data-target="#exampleModalCenter">
-                            <img class="icon" src="img/binary-icon.png" ng-switch-when="OTHER">
+                            <img src="img/directory-icon.png" ng-switch-when="DIRECTORY">
+                            <img src="img/music-note-icon.png" ng-switch-when="AUDIO">
+                            <img src="img/video-icon.png" ng-switch-when="VIDEO">
+                            <img src="img/binary-icon.png" ng-switch-when="OTHER">
                         </td>
                         <td>{{file.data.type}}</td>
                         <td>{{file.name}}</td>
                         <td>{{file.data.size}}</td>
+                        <td class="icons" ng-switch on="file.data.type">
+                            <button type="button" class="btn btn-sm btn-outline-info" ng-click="navigate(file.data.fullPath)"
+                                    ng-switch-when="DIRECTORY" data-toggle="modal" data-target="#exampleModalCenter">
+                                Open
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" ng-click="playFile(file)"
+                                    ng-switch-when="VIDEO"
+                                    data-toggle="modal" data-target="#exampleModalCenter">
+                                Play video
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" ng-click="playFile(file)"
+                                    ng-switch-when="AUDIO"
+                                    data-toggle="modal" data-target="#exampleModalCenter">
+                                Play audio
+                            </button>
+                        </td>
                     </tr>
                     <tr ng-if="files.length === 0">
                         <td colspan="4" class="text-center">
